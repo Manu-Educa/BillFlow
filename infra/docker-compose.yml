@@ -1,31 +1,20 @@
 version: '3.8'
 
 services:
-  mysql-db:
+  # Nuestro servidor de Base de Datos MySQL
+  billflow-db:
     image: mysql:8.0
-    container_name: billflow-mysql
+    container_name: mysql-server-billflow
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: billflow_db
-      MYSQL_USER: billflow_user
-      MYSQL_PASSWORD: billflow_password
+      MYSQL_DATABASE: billflow_db       # Crea la base de datos vacía automáticamente
+      MYSQL_USER: billflowAdmin                  # Usuario por defecto
+      MYSQL_ROOT_PASSWORD: root # Contraseña (¡cámbiala si quieres!)
     ports:
-      - "3306:3306"
+      - "3306:3306"                     # Conecta el puerto de tu PC con el de Docker
     volumes:
-      - mysql_data:/var/lib/mysql
+      - billflow_data:/var/lib/mysql    # Guarda los datos para que no se borren al apagar
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: billflow-phpmyadmin
-    restart: always
-    environment:
-      PMA_HOST: mysql-db
-      MYSQL_ROOT_PASSWORD: rootpassword
-    ports:
-      - "8080:80"
-    depends_on:
-      - mysql-db
-
+# Declaramos el volumen virtual para persistencia de datos
 volumes:
-  mysql_data:
+  billflow_data:
