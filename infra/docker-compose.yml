@@ -6,10 +6,12 @@ services:
     image: mysql:8.0
     container_name: mysql-server-billflow
     restart: always
+    env_file:
+      - .env
     environment:
-      MYSQL_DATABASE: billflow_db       # Crea la base de datos vacía automáticamente
-      MYSQL_USER: billflowAdmin                  # Usuario por defecto
-      MYSQL_ROOT_PASSWORD: root # Contraseña (¡cámbiala si quieres!)
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "3306:3306"                     # Conecta el puerto de tu PC con el de Docker
     volumes:
