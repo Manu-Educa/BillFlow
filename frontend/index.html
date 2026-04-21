@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BillFlow - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            charcoal: '#263238',
+            teal: '#20B2AA',
+            coral: '#FF7F50',
+            lightbg: '#F0F3F5',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .neu-shadow { box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff; }
+    .neu-search { box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff; }
+  </style>
+</head>
+<body class="bg-lightbg text-gray-700 flex h-screen overflow-hidden">
+
+<aside class="w-64 bg-charcoal flex flex-col justify-between text-white shadow-xl z-20">
+  <div>
+    <div class="p-6 flex items-center space-x-3">
+      <span class="text-2xl font-bold tracking-wide text-teal">BillFlow</span>
+    </div>
+    <nav class="mt-6 px-4 space-y-2">
+      <a href="#" class="flex items-center space-x-3 bg-teal bg-opacity-20 text-teal px-4 py-3 rounded-xl font-medium">Inicio</a>
+      <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 font-medium">Gastos</a>
+      <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 font-medium">Presupuesto</a>
+    </nav>
+  </div>
+</aside>
+
+<main class="flex-1 flex flex-col h-screen overflow-y-auto">
+  <header class="h-20 px-10 flex items-center justify-between bg-lightbg z-10">
+    <h1 class="text-2xl font-bold text-gray-800">Resumen General</h1>
+    <div class="flex items-center space-x-4">
+      <span class="font-medium text-sm">Usuario Activo</span>
+      <div class="w-10 h-10 rounded-full bg-teal flex items-center justify-center text-white font-bold">UA</div>
+    </div>
+  </header>
+
+  <div class="p-10 pt-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+      <div class="bg-lightbg neu-shadow rounded-2xl p-6">
+        <h2 class="text-sm font-medium text-gray-500 mb-2">Gasto Total</h2>
+        <p id="gasto-total" class="text-4xl font-bold text-teal mb-1">Cargando...</p>
+        <p class="text-xs text-gray-400">Este Mes</p>
+      </div>
+      <div class="bg-lightbg neu-shadow rounded-2xl p-6">
+        <h2 class="text-sm font-medium text-gray-500 mb-2">Presupuesto Restante</h2>
+        <p id="presupuesto-restante" class="text-4xl font-bold text-coral mb-1">Cargando...</p>
+        <p class="text-xs text-gray-400">Disponible</p>
+      </div>
+      <div class="bg-lightbg neu-shadow rounded-2xl p-6">
+        <h2 class="text-sm font-medium text-gray-500 mb-4">Estado</h2>
+        <div class="w-full bg-gray-200 rounded-full h-3 mb-4 neu-search">
+          <div id="barra-estado" class="bg-gray-400 h-3 rounded-full" style="width: 0%"></div>
+        </div>
+        <span id="texto-estado" class="text-sm font-medium text-gray-600">Calculando estado...</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 bg-lightbg neu-shadow rounded-2xl p-8">
+        <h2 class="text-lg font-bold mb-6 text-gray-800">Últimos Movimientos</h2>
+        <div id="lista-movimientos" class="space-y-4">
+          <p class="text-sm text-gray-500">Obteniendo datos del servidor...</p>
+        </div>
+      </div>
+
+      <div class="bg-lightbg neu-shadow rounded-2xl p-8 flex flex-col items-center">
+        <h2 class="text-lg font-bold mb-6 text-gray-800 w-full text-left">Gastos por Categoría</h2>
+        <div class="relative w-48 h-48 mb-6">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="js/custom-home.js"></script>
+</body>
+</html>

@@ -1,20 +1,33 @@
 version: '3.8'
-
- services:
-  # Nuestro servidor de Base de Datos MySQL
-  billflow-db:
+services:
+  db:
     image: mysql:8.0
-    container_name: mysql-server-billflow
-    restart: always
+    container_name: billflow-db
     environment:
-      MYSQL_DATABASE: billflow_db       # Crea la base de datos vacía automáticamente
-      MYSQL_USER: billflowAdmin                  # Usuario por defecto
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: billflow_db
     ports:
-      - "3306:3306"                     # Conecta el puerto de tu PC con el de Docker
-    volumes:
-      - billflow_data:/var/lib/mysql    # Guarda los datos para que no se borren al apagar
+      - "3307:3306"
+    restart: unless-stopped
 
-# Declara el volumen virtual para persistencia de datos
-volumes:
-  billflow_data:
+  backend:
+    build: ./backend
+    container_name: billflow-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/billflow_db?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - db
+
+  frontend:
+    image: nginx:alpine
+    container_name: billflow-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - backend
