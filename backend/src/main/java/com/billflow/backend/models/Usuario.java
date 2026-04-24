@@ -1,5 +1,6 @@
 package com.billflow.backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +21,8 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false)
+    // Usamos JsonIgnore para ocultar la contraseña al ser información sensible
+    @JsonIgnore
     private String password;
 
     private String telefono;
