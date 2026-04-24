@@ -16,13 +16,19 @@ public class Presupuesto {
     @Column(nullable = false)
     private Integer mes;
 
-    // Aquí está el cambio principal: year con 'y' minúscula
     @Column(nullable = false)
     private Integer year;
 
+    // --- AQUÍ ESTÁ LA MAGIA DE TU LÓGICA ---
+    // Puede ser de un grupo (puede estar vacío si es individual)
     @ManyToOne
     @JoinColumn(name = "id_grupo")
     private Grupo grupo;
+
+    // O puede ser de un usuario (puede estar vacío si es de grupo)
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
     // --- GETTERS Y SETTERS ---
 
@@ -66,5 +72,11 @@ public class Presupuesto {
         this.grupo = grupo;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
 
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 }
