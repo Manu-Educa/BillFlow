@@ -131,3 +131,34 @@ function generarGrafico(gastos) {
         }
     });
 }
+document.addEventListener("DOMContentLoaded", () => {
+    configurarPerfilUsuario();
+    obtenerDatosDelServidor();
+    configurarMenuPerfil();
+});
+
+function configurarMenuPerfil() {
+    const perfilBtn = document.getElementById('perfil-btn');
+    const perfilDropdown = document.getElementById('perfil-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    if (perfilBtn && perfilDropdown) {
+        perfilBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            perfilDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!perfilBtn.contains(e.target) && !perfilDropdown.contains(e.target)) {
+                perfilDropdown.classList.add('hidden');
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        });
+    }
+}
