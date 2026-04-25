@@ -9,8 +9,8 @@ if (empty($mensaje_usuario)){
     echo "<Response><Message>Error: Mensaje vacío.</Message></Response>";    exit;
     exit;
 }
-
-$openai_api_key = '';
+// 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
+$openai_api_key = 'AQUI_VA_TU_CLAVE_DE_API_DE_OPENAI';
 $url_openai = 'https://api.openai.com/v1/chat/completions';
 
 $$system_prompt = "Eres un Asistente Financiero para el sistema BillFlow. 

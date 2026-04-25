@@ -69,7 +69,7 @@ $pdf->Cell(array_sum($w), 0, '', 'T');
 $pdf->Ln(5);
 // total gastado
 $pdf->SetFont('Arial', 'B', 12);
-$pdf->Ceññ(150,10, 'TOTAL GASTADO:', 0, 0, 'R');
+$pdf->Cell(150,10, 'TOTAL GASTADO:', 0, 0, 'R');
 $pdf->SetTextColor(200,0,0);
 $pdf->Cell(40,10, number_format($total_gastado, 2) . ' ' . chr(128), 0, 1, 'R');
 // salida del PDF

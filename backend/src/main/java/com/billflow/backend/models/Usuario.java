@@ -1,5 +1,6 @@
 package com.billflow.backend.models;
 
+<<<<<<< HEAD
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +9,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+=======
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+>>>>>>> 828fc0e05db97fc22379167649251e291321091d
 
 @Entity
 @Table(name = "usuarios")
@@ -27,6 +32,8 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false)
+    // Usamos JsonIgnore para ocultar la contraseña al ser información sensible
+    @JsonIgnore
     private String password;
 
     private String telefono;
