@@ -2,16 +2,26 @@ const API_URL = 'http://localhost:8081/api';
 let chartGastos = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    configurarPerfilUsuario();
     obtenerDatosDelServidor();
 });
+
+function configurarPerfilUsuario() {
+    const nombreGuardado = localStorage.getItem('usuarioNombre');
+    const displayNombre = document.getElementById('display-nombre');
+    const displayIniciales = document.getElementById('display-iniciales');
+
+    if (nombreGuardado) {
+        if (displayNombre) displayNombre.textContent = nombreGuardado;
+        if (displayIniciales) displayIniciales.textContent = nombreGuardado.substring(0, 2).toUpperCase();
+    }
+}
 
 async function obtenerDatosDelServidor() {
     try {
         const respuesta = await fetch(`${API_URL}/gastos`, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         });
 
         if (!respuesta.ok) throw new Error('Error en la respuesta del servidor');
@@ -21,14 +31,17 @@ async function obtenerDatosDelServidor() {
 
     } catch (error) {
         console.error("Fallo de conexión:", error);
-        document.getElementById('lista-movimientos').innerHTML =
-            '<p class="text-red-500 text-sm">Error al conectar con la base de datos. Verifique que el backend esté en ejecución.</p>';
+        const contenedorLista = document.getElementById('lista-movimientos');
+        if (contenedorLista) {
+            contenedorLista.innerHTML = '<p class="text-red-500 text-sm">Error al conectar con la base de datos.</p>';
+        }
     }
 }
 
 function procesarDashboard(gastos) {
     if (!gastos || gastos.length === 0) {
-        document.getElementById('lista-movimientos').innerHTML = '<p class="text-gray-500">No hay movimientos registrados.</p>';
+        const contenedorLista = document.getElementById('lista-movimientos');
+        if (contenedorLista) contenedorLista.innerHTML = '<p class="text-gray-500">No hay movimientos registrados.</p>';
         return;
     }
 
@@ -36,8 +49,11 @@ function procesarDashboard(gastos) {
     const limitePresupuesto = 1500.00;
     const balanceRestante = limitePresupuesto - totalGastado;
 
-    document.getElementById('gasto-total').textContent = `€ ${totalGastado.toFixed(2)}`;
-    document.getElementById('presupuesto-restante').textContent = `€ ${balanceRestante.toFixed(2)}`;
+    const elGastoTotal = document.getElementById('gasto-total');
+    const elPresupuestoRestante = document.getElementById('presupuesto-restante');
+
+    if (elGastoTotal) elGastoTotal.textContent = `€ ${totalGastado.toFixed(2)}`;
+    if (elPresupuestoRestante) elPresupuestoRestante.textContent = `€ ${balanceRestante.toFixed(2)}`;
 
     actualizarSemaforo(totalGastado, limitePresupuesto);
     renderizarLista(gastos);
@@ -49,24 +65,26 @@ function actualizarSemaforo(gastado, limite) {
     const barra = document.getElementById('barra-estado');
     const texto = document.getElementById('texto-estado');
 
-    barra.style.width = `${porcentaje}%`;
-
-    if (porcentaje < 70) {
-        barra.className = 'bg-teal h-3 rounded-full';
-        texto.textContent = 'Estado óptimo. Presupuesto controlado.';
-    } else if (porcentaje < 90) {
-        barra.className = 'bg-yellow-400 h-3 rounded-full';
-        texto.textContent = 'Atención. Acercándose al límite de gastos.';
-    } else {
-        barra.className = 'bg-coral h-3 rounded-full';
-        texto.textContent = 'Alerta. Presupuesto excedido o en riesgo.';
+    if (barra) {
+        barra.style.width = `${porcentaje}%`;
+        if (porcentaje < 70) {
+            barra.className = 'bg-teal h-3 rounded-full';
+            if (texto) texto.textContent = 'Estado óptimo. Presupuesto controlado.';
+        } else if (porcentaje < 90) {
+            barra.className = 'bg-yellow-400 h-3 rounded-full';
+            if (texto) texto.textContent = 'Atención. Acercándose al límite de gastos.';
+        } else {
+            barra.className = 'bg-coral h-3 rounded-full';
+            if (texto) texto.textContent = 'Alerta. Presupuesto excedido o en riesgo.';
+        }
     }
 }
 
 function renderizarLista(gastos) {
     const contenedor = document.getElementById('lista-movimientos');
+    if (!contenedor) return;
+    
     contenedor.innerHTML = '';
-
     const recientes = gastos.slice(-5).reverse();
 
     recientes.forEach(gasto => {
@@ -87,13 +105,15 @@ function renderizarLista(gastos) {
 }
 
 function generarGrafico(gastos) {
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) return;
+
     const categorias = gastos.reduce((acc, gasto) => {
         acc[gasto.categoria] = (acc[gasto.categoria] || 0) + parseFloat(gasto.cantidad);
         return acc;
     }, {});
 
-    const ctx = document.getElementById('categoryChart').getContext('2d');
-
+    const ctx = canvas.getContext('2d');
     if (chartGastos) chartGastos.destroy();
 
     chartGastos = new Chart(ctx, {

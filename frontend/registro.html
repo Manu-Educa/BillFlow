@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BillFlow</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    tailwind.config = { theme: { extend: { colors: { charcoal: '#263238', teal: '#20B2AA', lightbg: '#F0F3F5' } } } }
+  </script>
+</head>
+<body class="bg-lightbg flex items-center justify-center h-screen">
+  <div class="bg-lightbg neu-shadow p-8 rounded-3xl w-full max-w-sm">
+    <h2 class="text-2xl font-bold text-center text-charcoal mb-6">Crear Cuenta</h2>
+    <form id="registerForm" class="space-y-4">
+      <input type="text" id="regUser" class="w-full bg-lightbg neu-search rounded-xl py-3 px-4 outline-none" placeholder="Usuario" required>
+      <input type="email" id="regEmail" class="w-full bg-lightbg neu-search rounded-xl py-3 px-4 outline-none" placeholder="Correo electrónico" required>
+      <input type="password" id="regPass" class="w-full bg-lightbg neu-search rounded-xl py-3 px-4 outline-none" placeholder="Contraseña" required>
+      <input type="password" id="regPassConfirm" class="w-full bg-lightbg neu-search rounded-xl py-3 px-4 outline-none" placeholder="Confirmar contraseña" required>
+      <button type="submit" class="w-full bg-teal text-white font-bold py-3 rounded-xl shadow-lg">Registrarse</button>
+    </form>
+    <p class="mt-6 text-center text-xs text-gray-400">
+      ¿Ya tienes cuenta? <a href="login.html" class="text-teal font-bold">Inicia sesión</a>
+    </p>
+  </div>
+  <script src="js/custom-registro.js"></script>
+</body>
+</html>
