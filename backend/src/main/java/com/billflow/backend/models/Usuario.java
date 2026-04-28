@@ -1,6 +1,7 @@
 package com.billflow.backend.models;
 
-<<<<<<< HEAD
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,10 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-=======
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
->>>>>>> 828fc0e05db97fc22379167649251e291321091d
 
 @Entity
 @Table(name = "usuarios")
@@ -32,22 +29,17 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false)
-    // Usamos JsonIgnore para ocultar la contraseña al ser información sensible
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String telefono;
-
     private Double nomina = 0.0;
-
     private String rol = "USER";
 
-    // Relación: Muchos usuarios pertenecen a un Grupo
     @ManyToOne
     @JoinColumn(name = "id_grupo")
     private Grupo grupo;
 
-    // --- GETTERS Y SETTERS ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getNombre() { return nombre; }
