@@ -1,6 +1,6 @@
 package com.billflow.backend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,13 +29,11 @@ public class Usuario {
     private String email;
 
     @Column(nullable = false)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String telefono;
-
     private Double nomina = 0.0;
-
     private String rol = "USER";
 
     @ManyToOne

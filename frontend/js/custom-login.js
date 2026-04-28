@@ -19,6 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
+                    // Extraemos los datos del usuario para obtener su ID
+                    try {
+                        const data = await response.json();
+                        if (data && data.id) {
+                            localStorage.setItem('usuarioId', data.id);
+                        } else {
+                            localStorage.setItem('usuarioId', 1); // Respaldo por seguridad
+                        }
+                    } catch(e) {
+                        localStorage.setItem('usuarioId', 1); // Respaldo si el backend devuelve texto
+                    }
+                    
                     localStorage.setItem('usuarioNombre', valorNombre);
                     window.location.href = "index.html";
                 } else {

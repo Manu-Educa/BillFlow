@@ -9,6 +9,8 @@ services:
     ports:
       - "3307:3306"
     restart: unless-stopped
+    volumes:
+      - billflow_mysql_data:/var/lib/mysql
 
   backend:
     build: ./backend
@@ -31,3 +33,6 @@ services:
       - ./frontend:/usr/share/nginx/html
     depends_on:
       - backend
+
+volumes:
+  billflow_mysql_data:
