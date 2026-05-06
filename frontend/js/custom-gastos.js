@@ -8,16 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function configurarPerfilUsuario() {
-    const nombreGuardado = localStorage.getItem('usuarioNombre');
+    const nombreGuardado = localStorage.getItem('usuarioNombre') || 'admin';
     const displayNombre = document.getElementById('display-nombre');
     const displayIniciales = document.getElementById('display-iniciales');
 
-    if (nombreGuardado) {
-        if (displayNombre) displayNombre.textContent = nombreGuardado;
-        if (displayIniciales) displayIniciales.textContent = nombreGuardado.substring(0, 2).toUpperCase();
-    } else {
-        window.location.href = 'login.html';
-    }
+    if (displayNombre) displayNombre.textContent = nombreGuardado;
+    if (displayIniciales) displayIniciales.textContent = nombreGuardado.substring(0, 2).toUpperCase();
 }
 
 function configurarMenuPerfil() {
@@ -30,14 +26,12 @@ function configurarMenuPerfil() {
             e.stopPropagation();
             perfilDropdown.classList.toggle('hidden');
         });
-
         document.addEventListener('click', (e) => {
             if (!perfilBtn.contains(e.target) && !perfilDropdown.contains(e.target)) {
                 perfilDropdown.classList.add('hidden');
             }
         });
     }
-
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             localStorage.clear();
@@ -50,7 +44,6 @@ async function cargarGastos() {
     try {
         const respuesta = await fetch(`${API_URL}/gastos`);
         if (!respuesta.ok) throw new Error('Error al obtener gastos');
-        
         const gastos = await respuesta.json();
         renderizarTablaGastos(gastos);
     } catch (error) {
@@ -82,7 +75,7 @@ function renderizarTablaGastos(gastos) {
         fila.innerHTML = `
             <td class="p-4 font-semibold text-gray-700">${gasto.concepto}</td>
             <td class="p-4"><span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md">${nombreCategoria}</span></td>
-            <td class="p-4 text-sm text-gray-500">${gasto.fecha || new Date().toLocaleDateString()}</td>
+            <td class="p-4 text-sm text-gray-500">${gasto.fecha}</td>
             <td class="p-4 text-right font-bold text-teal">€ ${parseFloat(gasto.importe).toFixed(2)}</td>
             <td class="p-4 text-center">
                 <button class="text-coral hover:text-red-600 transition p-1" onclick="eliminarGasto(${gasto.id})">
@@ -114,19 +107,13 @@ function configurarModal() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const idUsuario = localStorage.getItem('usuarioId') || 1;
-
         const nuevoGasto = {
             concepto: document.getElementById('gasto-concepto').value,
             importe: parseFloat(document.getElementById('gasto-cantidad').value),
             fecha: document.getElementById('gasto-fecha').value,
-            categoria: {
-                id: parseInt(document.getElementById('gasto-categoria').value)
-            },
-            usuario: {
-                id: parseInt(idUsuario)
-            }
+            categoria: { id: parseInt(document.getElementById('gasto-categoria').value) },
+            usuario: { id: parseInt(idUsuario) }
         };
 
         try {
@@ -135,34 +122,26 @@ function configurarModal() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(nuevoGasto)
             });
-
             if (respuesta.ok) {
                 modal.classList.add('hidden');
                 form.reset();
                 cargarGastos();
             } else {
-                alert('Error al guardar el gasto en la base de datos.');
+                alert('Error al guardar el gasto.');
             }
         } catch (error) {
-            alert('Error de conexión con el servidor.');
+            alert('Error de conexión.');
         }
     });
 }
 
-async function eliminarGasto(id) {
+window.eliminarGasto = async function(id) {
     if (!confirm('¿Seguro que quieres eliminar este gasto?')) return;
-
     try {
-        const respuesta = await fetch(`${API_URL}/gastos/${id}`, {
-            method: 'DELETE'
-        });
-
-        if (respuesta.ok) {
-            cargarGastos();
-        } else {
-            alert('Error al eliminar');
-        }
+        const respuesta = await fetch(`${API_URL}/gastos/${id}`, { method: 'DELETE' });
+        if (respuesta.ok) cargarGastos();
+        else alert('Error al eliminar');
     } catch (error) {
         alert('Error de conexión');
     }
-}
+};

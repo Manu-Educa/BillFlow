@@ -4,16 +4,22 @@ let todosLosGastos = [];
 document.addEventListener("DOMContentLoaded", () => {
     configurarPerfilUsuario();
     configurarMenuPerfil();
+    generarOpcionesMeses();
+    configurarSelectorMes();
     cargarDatosDashboard();
 });
 
 function configurarPerfilUsuario() {
-    const nombreGuardado = localStorage.getItem('usuarioNombre') || 'admin';
+    const nombreGuardado = localStorage.getItem('usuarioNombre');
     const displayNombre = document.getElementById('display-nombre');
     const displayIniciales = document.getElementById('display-iniciales');
 
-    if (displayNombre) displayNombre.textContent = nombreGuardado;
-    if (displayIniciales) displayIniciales.textContent = nombreGuardado.substring(0, 2).toUpperCase();
+    if (nombreGuardado) {
+        if (displayNombre) displayNombre.textContent = nombreGuardado;
+        if (displayIniciales) displayIniciales.textContent = nombreGuardado.substring(0, 2).toUpperCase();
+    } else {
+        window.location.href = 'login.html';
+    }
 }
 
 function configurarMenuPerfil() {
@@ -32,6 +38,7 @@ function configurarMenuPerfil() {
             }
         });
     }
+
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             localStorage.clear();
@@ -40,29 +47,88 @@ function configurarMenuPerfil() {
     }
 }
 
+function generarOpcionesMeses() {
+    const selector = document.getElementById('filtro-mes');
+    if (!selector) return;
+    
+    selector.innerHTML = '';
+    const mesesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const hoy = new Date();
+
+    for (let i = 0; i < 5; i++) {
+        const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+        const anio = fecha.getFullYear();
+        const mes = fecha.getMonth();
+        const mesValor = `${anio}-${String(mes + 1).padStart(2, '0')}`;
+        const mesTexto = `${mesesNombres[mes]} ${anio}`;
+        
+        const option = document.createElement('option');
+        option.value = mesValor;
+        option.textContent = mesTexto;
+        selector.appendChild(option);
+    }
+}
+
+function configurarSelectorMes() {
+    const selector = document.getElementById('filtro-mes');
+    if (selector) {
+        selector.addEventListener('change', () => {
+            procesarDatosVista(selector.value);
+            actualizarTitulo(selector);
+        });
+    }
+}
+
+function actualizarTitulo(selector) {
+    const titulo = document.getElementById('titulo-resumen');
+    if (titulo && selector.selectedIndex >= 0) {
+        titulo.textContent = `Resumen de ${selector.options[selector.selectedIndex].text}`;
+    }
+}
+
 async function cargarDatosDashboard() {
     try {
         const respuesta = await fetch(`${API_URL}/gastos`);
         if (!respuesta.ok) throw new Error('Error de red');
+        
         todosLosGastos = await respuesta.json();
-        renderizarTarjetas(todosLosGastos);
-        renderizarUltimosMovimientos(todosLosGastos);
-        renderizarGrafico(todosLosGastos);
+        
+        const selector = document.getElementById('filtro-mes');
+        const mesActual = selector ? selector.value : (() => {
+            const hoy = new Date();
+            return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+        })();
+        
+        procesarDatosVista(mesActual);
+        if (selector) actualizarTitulo(selector);
     } catch (error) {
         const contenedor = document.getElementById('lista-movimientos');
-        if (contenedor) contenedor.innerHTML = `<p class="text-red-500">Error al cargar datos.</p>`;
+        if (contenedor) {
+            contenedor.innerHTML = `<p class="text-red-500">Error al cargar datos.</p>`;
+        }
     }
+}
+
+function procesarDatosVista(mesAnio) {
+    const gastosFiltrados = todosLosGastos.filter(gasto => {
+        if (!gasto.fecha) return false;
+        return gasto.fecha.startsWith(mesAnio);
+    });
+
+    renderizarTarjetas(gastosFiltrados);
+    renderizarUltimosMovimientos(gastosFiltrados);
+    renderizarGrafico(gastosFiltrados);
 }
 
 function renderizarTarjetas(gastos) {
     const totalGasto = gastos.reduce((suma, gasto) => suma + (parseFloat(gasto.importe) || 0), 0);
-    const presupuestoGlobal = parseFloat(localStorage.getItem('limitePresupuesto')) || 1500;
-    const restante = presupuestoGlobal - totalGasto;
+    const presupuestoMensual = parseFloat(localStorage.getItem('limitePresupuesto')) || 1500;
+    const restante = presupuestoMensual - totalGasto;
     
     document.getElementById('gasto-total').textContent = `€ ${totalGasto.toFixed(2)}`;
     document.getElementById('presupuesto-restante').textContent = `€ ${restante.toFixed(2)}`;
     
-    const porcentaje = Math.min((totalGasto / presupuestoGlobal) * 100, 100);
+    const porcentaje = Math.min((totalGasto / presupuestoMensual) * 100, 100);
     const barraEstado = document.getElementById('barra-estado');
     const textoEstado = document.getElementById('texto-estado');
     
@@ -86,17 +152,18 @@ function renderizarUltimosMovimientos(gastos) {
     contenedor.innerHTML = '';
 
     if (gastos.length === 0) {
-        contenedor.innerHTML = '<p class="text-gray-500">No hay movimientos.</p>';
+        contenedor.innerHTML = '<p class="text-gray-500">No hay movimientos este mes.</p>';
         return;
     }
 
-    const ultimosGastos = gastos.slice().reverse().slice(0, 5);
+    const ultimosGastos = gastos.slice().reverse();
 
     ultimosGastos.forEach(gasto => {
         let nombreCategoria = 'Sin Categoría';
         if (gasto.categoria) {
             nombreCategoria = typeof gasto.categoria === 'object' ? (gasto.categoria.nombre || 'Categoría') : gasto.categoria;
         }
+
         const div = document.createElement('div');
         div.className = 'flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100 neu-shadow-sm mb-3';
         div.innerHTML = `
@@ -116,12 +183,17 @@ function renderizarUltimosMovimientos(gastos) {
 function renderizarGrafico(gastos) {
     const ctx = document.getElementById('categoryChart');
     if (!ctx) return;
+
     const gastosPorCategoria = {};
     gastos.forEach(gasto => {
         let nombreCat = gasto.categoria && gasto.categoria.nombre ? gasto.categoria.nombre : 'Otros';
         gastosPorCategoria[nombreCat] = (gastosPorCategoria[nombreCat] || 0) + parseFloat(gasto.importe);
     });
-    if (window.miGrafico) window.miGrafico.destroy();
+
+    if (window.miGrafico) {
+        window.miGrafico.destroy();
+    }
+
     window.miGrafico = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -133,8 +205,11 @@ function renderizarGrafico(gastos) {
             }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+            }
         }
     });
 }

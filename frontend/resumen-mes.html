@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BillFlow</title>
+  <title>Resumen del Mes - BillFlow</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="css/styles.css">
@@ -11,12 +11,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            charcoal: '#263238',
-            teal: '#20B2AA',
-            coral: '#FF7F50',
-            lightbg: '#F0F3F5',
-          }
+          colors: { charcoal: '#263238', teal: '#20B2AA', coral: '#FF7F50', lightbg: '#F0F3F5' }
         }
       }
     }
@@ -30,22 +25,19 @@
       <span class="text-2xl font-bold tracking-wide text-teal">BillFlow</span>
     </div>
     <nav class="mt-6 px-4 space-y-2">
-      <a href="#" class="flex items-center space-x-3 bg-teal bg-opacity-20 text-teal px-4 py-3 rounded-xl font-medium">
+      <a href="index.html" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white transition-colors font-medium">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
         <span>Inicio</span>
       </a>
-      
       <a href="gastos.html" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white transition-colors font-medium">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
         <span>Gastos</span>
       </a>
-      
       <a href="presupuestos.html" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white transition-colors font-medium">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <span>Presupuesto</span>
       </a>
-      
-      <a href="resumen-mes.html" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:text-white transition-colors font-medium">
+      <a href="resumen-mes.html" class="flex items-center space-x-3 bg-teal bg-opacity-20 text-teal px-4 py-3 rounded-xl font-medium">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
         <span>Resumen del Mes</span>
       </a>
@@ -55,43 +47,38 @@
       </a>
     </nav>
   </div>
+  <div class="p-4 mb-4">
+    <select id="filtro-mes" class="w-full bg-gray-800 text-gray-300 text-sm rounded-lg p-2.5 border border-gray-700 focus:ring-green-500 focus:border-green-500"></select>
+  </div>
 </aside>
 
 <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-  <header class="h-20 px-10 flex items-center justify-between bg-lightbg z-10">
-  <h1 class="text-2xl font-bold text-gray-800">Resumen General</h1>
-  
-  <div class="relative">
-    <button id="perfil-btn" class="flex items-center space-x-4 focus:outline-none hover:bg-gray-200 p-2 rounded-lg transition cursor-pointer">
-      <span id="display-nombre" class="font-medium text-sm text-charcoal">Usuario Activo</span>
-      <div id="display-iniciales" class="w-10 h-10 rounded-full bg-teal flex items-center justify-center text-white font-bold pointer-events-none">
-        UA
-      </div>
-    </button>
-
-    <div id="perfil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100">
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal hover:bg-opacity-10 hover:text-teal transition">
-        Editar perfil
-      </a>
-      <hr class="my-1 border-gray-100">
-      <button id="logout-btn" class="w-full text-left block px-4 py-2 text-sm text-coral hover:bg-red-50 transition">
-        Cerrar sesión
+  <header class="h-20 px-10 flex items-center justify-between bg-lightbg z-10 border-b border-gray-200">
+    <h1 id="titulo-resumen" class="text-2xl font-bold text-gray-800">Cargando...</h1>
+    
+    <div class="relative">
+      <button id="perfil-btn" class="flex items-center space-x-4 focus:outline-none hover:bg-gray-200 p-2 rounded-lg transition cursor-pointer">
+        <span id="display-nombre" class="font-medium text-sm text-charcoal">Usuario Activo</span>
+        <div id="display-iniciales" class="w-10 h-10 rounded-full bg-teal flex items-center justify-center text-white font-bold pointer-events-none">UA</div>
       </button>
-    </div>
-  </div>
 
-</header>
+      <div id="perfil-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100">
+        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal hover:bg-opacity-10 hover:text-teal transition">Editar perfil</a>
+        <hr class="my-1 border-gray-100">
+        <button id="logout-btn" class="w-full text-left block px-4 py-2 text-sm text-coral hover:bg-red-50 transition">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
 
   <div class="p-10 pt-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
       <div class="bg-lightbg neu-shadow rounded-2xl p-6">
-        <h2 class="text-sm font-medium text-gray-500 mb-2">Gasto Total</h2>
+        <h2 class="text-sm font-medium text-gray-500 mb-2">Gasto del Mes</h2>
         <p id="gasto-total" class="text-4xl font-bold text-teal mb-1">Cargando...</p>
       </div>
       <div class="bg-lightbg neu-shadow rounded-2xl p-6">
         <h2 class="text-sm font-medium text-gray-500 mb-2">Presupuesto Restante</h2>
         <p id="presupuesto-restante" class="text-4xl font-bold text-coral mb-1">Cargando...</p>
-        <p class="text-xs text-gray-400">Disponible</p>
       </div>
       <div class="bg-lightbg neu-shadow rounded-2xl p-6">
         <h2 class="text-sm font-medium text-gray-500 mb-4">Estado</h2>
@@ -104,12 +91,9 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div class="lg:col-span-2 bg-lightbg neu-shadow rounded-2xl p-8">
-        <h2 class="text-lg font-bold mb-6 text-gray-800">Últimos Movimientos</h2>
-        <div id="lista-movimientos" class="space-y-4">
-          <p class="text-sm text-gray-500">Obteniendo datos del servidor...</p>
-        </div>
+        <h2 class="text-lg font-bold mb-6 text-gray-800">Movimientos del Mes</h2>
+        <div id="lista-movimientos" class="space-y-4"></div>
       </div>
-
       <div class="bg-lightbg neu-shadow rounded-2xl p-8 flex flex-col items-center">
         <h2 class="text-lg font-bold mb-6 text-gray-800 w-full text-left">Gastos por Categoría</h2>
         <div class="relative w-48 h-48 mb-6">
@@ -120,6 +104,6 @@
   </div>
 </main>
 
-<script src="js/custom-index.js"></script>
+<script src="js/custom-resumen-mes.js"></script>
 </body>
 </html>
