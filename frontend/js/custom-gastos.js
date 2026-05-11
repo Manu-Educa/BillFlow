@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     configurarMenuPerfil();
     cargarGastos();
     configurarModal();
+    configurarSelectorCategoria(); // Consolidado aquí arriba
 });
 
 function configurarPerfilUsuario() {
@@ -76,7 +77,7 @@ function renderizarTablaGastos(gastos) {
             <td class="p-4 font-semibold text-gray-700">${gasto.concepto}</td>
             <td class="p-4"><span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-md">${nombreCategoria}</span></td>
             <td class="p-4 text-sm text-gray-500">${gasto.fecha}</td>
-            <td class="p-4 text-right font-bold text-teal">€ ${parseFloat(gasto.importe).toFixed(2)}</td>
+            <td class="p-4 text-right font-bold text-teal">${parseFloat(gasto.importe).toFixed(2)} €</td>
             <td class="p-4 text-center">
                 <button class="text-coral hover:text-red-600 transition p-1" onclick="eliminarGasto(${gasto.id})">
                     <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -85,6 +86,28 @@ function renderizarTablaGastos(gastos) {
         `;
         tabla.appendChild(fila);
     });
+}
+
+function configurarSelectorCategoria() {
+    // CORRECCIÓN: Apuntamos al ID correcto "gasto-categoria"
+    const selectCategoria = document.getElementById('gasto-categoria');
+    const contenedorPersonalizado = document.getElementById('contenedor-categoria-personalizada');
+    const inputPersonalizado = document.getElementById('categoria-personalizada');
+
+    if (selectCategoria && contenedorPersonalizado && inputPersonalizado) {
+        selectCategoria.addEventListener('change', () => {
+            const opcionSeleccionada = selectCategoria.options[selectCategoria.selectedIndex].text;
+            
+            if (opcionSeleccionada === 'Otros') {
+                contenedorPersonalizado.classList.remove('hidden');
+                inputPersonalizado.setAttribute('required', 'true'); 
+            } else {
+                contenedorPersonalizado.classList.add('hidden');
+                inputPersonalizado.removeAttribute('required');
+                inputPersonalizado.value = '';
+            }
+        });
+    }
 }
 
 function configurarModal() {
@@ -103,16 +126,31 @@ function configurarModal() {
     btnCancelar.addEventListener('click', () => {
         modal.classList.add('hidden');
         form.reset();
+        // Ocultar el campo personalizado al cancelar para resetear la vista
+        document.getElementById('contenedor-categoria-personalizada').classList.add('hidden');
     });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const idUsuario = localStorage.getItem('usuarioId') || 1;
+        
+        // 1. Obtenemos el concepto original y la categoría seleccionada
+        let conceptoFinal = document.getElementById('gasto-concepto').value;
+        const categoriaId = parseInt(document.getElementById('gasto-categoria').value);
+        
+        // 2. Si la categoría es "Otros" (ID 6), añadimos el texto personalizado al concepto
+        if (categoriaId === 6) { 
+            const categoriaPersonalizada = document.getElementById('categoria-personalizada').value.trim();
+            if (categoriaPersonalizada !== '') {
+                conceptoFinal = `${conceptoFinal} (${categoriaPersonalizada})`;
+            }
+        }
+
         const nuevoGasto = {
-            concepto: document.getElementById('gasto-concepto').value,
+            concepto: conceptoFinal, // Usamos el concepto modificado
             importe: parseFloat(document.getElementById('gasto-cantidad').value),
             fecha: document.getElementById('gasto-fecha').value,
-            categoria: { id: parseInt(document.getElementById('gasto-categoria').value) },
+            categoria: { id: categoriaId },
             usuario: { id: parseInt(idUsuario) }
         };
 
@@ -125,6 +163,8 @@ function configurarModal() {
             if (respuesta.ok) {
                 modal.classList.add('hidden');
                 form.reset();
+                // Ocultar el campo de "Otros" al guardar exitosamente
+                document.getElementById('contenedor-categoria-personalizada').classList.add('hidden');
                 cargarGastos();
             } else {
                 alert('Error al guardar el gasto.');

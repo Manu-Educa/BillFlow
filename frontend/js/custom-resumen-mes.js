@@ -125,8 +125,8 @@ function renderizarTarjetas(gastos) {
     const presupuestoMensual = parseFloat(localStorage.getItem('limitePresupuesto')) || 1500;
     const restante = presupuestoMensual - totalGasto;
     
-    document.getElementById('gasto-total').textContent = `€ ${totalGasto.toFixed(2)}`;
-    document.getElementById('presupuesto-restante').textContent = `€ ${restante.toFixed(2)}`;
+    document.getElementById('gasto-total').textContent = `${totalGasto.toFixed(2)} €`;
+    document.getElementById('presupuesto-restante').textContent = `${restante.toFixed(2)} €`;
     
     const porcentaje = Math.min((totalGasto / presupuestoMensual) * 100, 100);
     const barraEstado = document.getElementById('barra-estado');
@@ -172,7 +172,7 @@ function renderizarUltimosMovimientos(gastos) {
                 <p class="text-xs text-gray-400">${gasto.fecha}</p>
             </div>
             <div class="text-right">
-                <h4 class="font-bold text-teal">€ ${parseFloat(gasto.importe).toFixed(2)}</h4>
+                <h4 class="font-bold text-teal">${parseFloat(gasto.importe).toFixed(2)} €</h4>
                 <p class="text-xs text-gray-400">${nombreCategoria}</p>
             </div>
         `;

@@ -58,7 +58,7 @@ function cargarFamilia() {
             div.innerHTML = `
                 <span class="font-medium text-gray-700">${miembro.nombre}</span>
                 <div class="flex items-center space-x-4">
-                    <span class="font-bold text-teal">€ ${miembro.nomina.toFixed(2)}</span>
+                    <span class="font-bold text-teal">${miembro.nomina.toFixed(2)} €</span>
                     <button onclick="eliminarMiembro(${index})" class="text-red-400 hover:text-red-600">✕</button>
                 </div>
             `;
@@ -66,7 +66,7 @@ function cargarFamilia() {
         });
     }
     
-    totalElement.textContent = `€ ${total.toFixed(2)}`;
+    totalElement.textContent = `${total.toFixed(2)} €`;
 }
 
 window.eliminarMiembro = function(index) {

@@ -53,33 +53,44 @@ async function cargarDatosDashboard() {
         if (contenedor) contenedor.innerHTML = `<p class="text-red-500">Error al cargar datos.</p>`;
     }
 }
-
 function renderizarTarjetas(gastos) {
     const totalGasto = gastos.reduce((suma, gasto) => suma + (parseFloat(gasto.importe) || 0), 0);
-    const presupuestoGlobal = parseFloat(localStorage.getItem('limitePresupuesto')) || 1500;
-    const restante = presupuestoGlobal - totalGasto;
+    const presupuestoMensual = parseFloat(localStorage.getItem('limitePresupuesto')) || 1500;
     
-    document.getElementById('gasto-total').textContent = `€ ${totalGasto.toFixed(2)}`;
-    document.getElementById('presupuesto-restante').textContent = `€ ${restante.toFixed(2)}`;
+    const mesesConGastos = new Set();
+    gastos.forEach(gasto => {
+        if (gasto.fecha) mesesConGastos.add(gasto.fecha.substring(0, 7));
+    });
+    const cantidadMeses = mesesConGastos.size > 0 ? mesesConGastos.size : 1;
     
-    const porcentaje = Math.min((totalGasto / presupuestoGlobal) * 100, 100);
+    const presupuestoAcumulado = presupuestoMensual * cantidadMeses;
+    const ahorroTotal = presupuestoAcumulado - totalGasto;
+    
+    document.getElementById('gasto-total').textContent = `${totalGasto.toFixed(2)} €`;
+    document.getElementById('presupuesto-restante').textContent = `${ahorroTotal.toFixed(2)} €`;
+    
+    const porcentaje = Math.min((totalGasto / presupuestoAcumulado) * 100, 100);
     const barraEstado = document.getElementById('barra-estado');
     const textoEstado = document.getElementById('texto-estado');
     
     if (barraEstado && textoEstado) {
         barraEstado.style.width = `${porcentaje}%`;
-        if (porcentaje >= 90) {
-            barraEstado.className = "bg-red-500 h-3 rounded-full";
-            textoEstado.textContent = "Alerta: Presupuesto en riesgo.";
-            textoEstado.classList.add("text-red-500");
-        } else {
-            barraEstado.className = "bg-teal h-3 rounded-full";
+        textoEstado.classList.remove("text-red-500", "text-orange-500", "text-teal");
+        
+        if (porcentaje <= 60) {
+            barraEstado.className = "bg-teal h-3 rounded-full transition-all duration-500";
             textoEstado.textContent = "Presupuesto saludable.";
-            textoEstado.classList.remove("text-red-500");
+        } else if (porcentaje > 60 && porcentaje <= 85) {
+            barraEstado.className = "bg-orange-400 h-3 rounded-full transition-all duration-500";
+            textoEstado.textContent = "Cuidado, te acercas al límite acumulado.";
+            textoEstado.classList.add("text-orange-500");
+        } else {
+            barraEstado.className = "bg-red-500 h-3 rounded-full transition-all duration-500";
+            textoEstado.textContent = porcentaje >= 100 ? "Has excedido tu presupuesto acumulado." : "Alerta: Presupuesto en riesgo.";
+            textoEstado.classList.add("text-red-500");
         }
     }
 }
-
 function renderizarUltimosMovimientos(gastos) {
     const contenedor = document.getElementById('lista-movimientos');
     if (!contenedor) return;
@@ -105,7 +116,7 @@ function renderizarUltimosMovimientos(gastos) {
                 <p class="text-xs text-gray-400">${gasto.fecha}</p>
             </div>
             <div class="text-right">
-                <h4 class="font-bold text-teal">€ ${parseFloat(gasto.importe).toFixed(2)}</h4>
+                <h4 class="font-bold text-teal">${parseFloat(gasto.importe).toFixed(2)} €</h4>
                 <p class="text-xs text-gray-400">${nombreCategoria}</p>
             </div>
         `;
@@ -134,7 +145,7 @@ function renderizarGrafico(gastos) {
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 16, font: { size: 20} } } }
         }
     });
 }

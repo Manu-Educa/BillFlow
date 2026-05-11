@@ -55,7 +55,7 @@ function renderizarSuscripciones(suscripciones) {
                     <h3 class="text-xl font-bold text-gray-800">${sus.concepto}</h3>
                     <p class="text-sm text-gray-500">Se cobra el día ${sus.diaCobro} de cada mes</p>
                 </div>
-                <span class="text-2xl font-bold text-teal">€ ${parseFloat(sus.importe).toFixed(2)}</span>
+                <span class="text-2xl font-bold text-teal">${parseFloat(sus.importe).toFixed(2)} €</span>
             </div>
             ${alertaHTML}
             <div class="mt-6 flex justify-end">
